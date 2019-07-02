@@ -1,0 +1,106 @@
+---
+title: "Reproducible Research Course Progect 1"
+author: "Kraev Anatoli"
+date: '28 èþíÿ 2019 ã '
+output: md_document
+---
+
+###About
+
+This is the first project for the **Reproducible Research** course in Coursera's Data Science specialization.
+This assignment makes use of data from a personal activity monitoring device (step counter).
+This device collects data at 5-minute intervals throughout the day. 
+The data consists of two months of data from an anonymous individual collected during the months of October and November, 2012 and include the number of steps taken in 5-minute intervals each day.
+
+The data for this assignment can be downloaded from the course web site.
+
+The variables included in this dataset are:
+**steps**:    Number of steps taking in a 5-minute interval (missing
+                values are coded as `NA`)
+**date**:     The date on which the measurement was taken in YYYY-MM-DD format
+**interval**: Identifier for the 5-minute interval in which measurement was taken
+
+## Loading and preprocessing the data
+For the preparation of data, the dplyr package was used.  
+Loading as the data frame and create the data frame table.
+```{r}
+library(dplyr)
+activity <- read.csv("repdata_data_activity/activity.csv", stringsAsFactors = FALSE)
+activity <- tbl_df(activity)
+summary(activity)
+activity$date <- as.Date(activity$date)
+```
+## What is mean total number of steps taken per day?
+Create the number of steps taken each day by the histogram, and calculate the mean and the median value.
+```{r}
+activity_date <- group_by(activity, date)
+
+sum_steps <- summarise(activity_date, sum_s = sum(steps, na.rm = TRUE))
+sum_steps <- filter(sum_steps, sum_s > 0)
+
+hist(sum_steps$sum_s, ylim = c(0,30), col = "blue", xlab = "Number of steps", main = "Total number of steps taken each day")
+```
+
+The mean of the total number of steps taken per day:
+```{r}
+mean(sum_steps$sum_s)
+```
+
+The median of the total number of steps taken per day:
+```{r}
+median(sum_steps$sum_s)
+```
+
+## What is the average daily activity pattern?
+Make a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis).
+```{r}
+activity_interval <- group_by(activity, interval)
+mean_interval <- summarise(activity_interval, mean_i = mean(steps, na.rm = TRUE))
+mean_interval
+
+with(mean_interval, plot(interval, mean_i, type="l", lwd = 2, col = "darkgreen", ylab = "Average number of steps", main = "Average number of steps per intervals"))
+```
+Which  is 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r}
+mean_interval[which.max(mean_interval$mean_i), ]$interval
+```
+
+## Imputing missing values
+
+The total number of missing values in the dataset:
+```{r}
+sum(!complete.cases(activity))
+```
+Creating is the new dataset that is equal to the original dataset but with the missing data filled in. For filling NA used mean value.
+```{r}
+activity_mean <- mutate(activity_interval,Mean=mean(steps,na.rm=TRUE),steps=replace(steps,which(is.na(steps)),first(Mean)))
+
+sum_steps_noNA <- group_by(activity_mean, date)
+sum_steps_noNA <- filter(sum_steps_noNA, steps > 0)
+
+sum_steps_noNA1 <- summarize(sum_steps_noNA,sum_s=sum(steps)) 
+sum_steps_noNA1
+
+hist(sum_steps_noNA1$sum_s,ylim = c(0,40), col = "red", xlab = "Number of steps + mean imputed", main = "Total number of steps taken each day + mean imputed")
+hist(sum_steps$sum_s,ylim = c(0,40), col = "blue", add = TRUE)
+legend("topright", c("Real", "Mean-Imputed"), col=c("blue", "red"), lwd=15)
+```
+
+## Are there differences in activity patterns between weekdays and weekends?
+Creating the new factor variable in the dataset with two levels - “weekday” and “weekend” indicating whether a given date is a weekday or weekend. 
+```{r}
+activity_weekdays <- mutate(sum_steps_noNA, weekday = weekdays(date))
+activity_weekdays$weekday[!activity_weekdays$weekday == "âîñêðåñåíüå" & !activity_weekdays$weekday == "ñóááîòà"] <- "Weekday"
+activity_weekdays$weekday[activity_weekdays$weekday == "âîñêðåñåíüå" | activity_weekdays$weekday == "ñóááîòà"] <- "Weekend"
+activity_weekdays2 <- group_by(activity_weekdays, interval, weekday)
+activity_weekdays2_sum <- summarise(activity_weekdays2, mean2 = mean(steps))
+```
+For plotting used the lattice package.
+
+```{r}
+library(lattice)
+xyplot(mean2 ~ interval | weekday, data = activity_weekdays2_sum, layout = c(1,2), type = "l", grid = TRUE, group = weekday,
+       ylab = "Average number of steps", xlab = "Interval", lwd = 2, main = "Average daily steps by type of date")
+
+```
+
