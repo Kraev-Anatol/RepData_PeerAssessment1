@@ -116,28 +116,13 @@ with the missing data filled in. For filling NA used mean value.
     sum_steps_noNA <- filter(sum_steps_noNA, steps > 0)
 
     sum_steps_noNA1 <- summarize(sum_steps_noNA,sum_s=sum(steps)) 
-    sum_steps_noNA1
-
-    ## # A tibble: 61 x 2
-    ##    date        sum_s
-    ##    <date>      <dbl>
-    ##  1 2012-10-01 10766.
-    ##  2 2012-10-02   126 
-    ##  3 2012-10-03 11352 
-    ##  4 2012-10-04 12116 
-    ##  5 2012-10-05 13294 
-    ##  6 2012-10-06 15420 
-    ##  7 2012-10-07 11015 
-    ##  8 2012-10-08 10766.
-    ##  9 2012-10-09 12811 
-    ## 10 2012-10-10  9900 
-    ## # ... with 51 more rows
+    
 
     hist(sum_steps_noNA1$sum_s,ylim = c(0,40), col = "red", xlab = "Number of steps + mean imputed", main = "Total number of steps taken each day + mean imputed")
     hist(sum_steps$sum_s,ylim = c(0,40), col = "blue", add = TRUE)
     legend("topright", c("Real", "Mean-Imputed"), col=c("blue", "red"), lwd=15)
 
-![](PA1_template_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+![Number steps + mean imputed](figure/tmi.png)
 
 Are there differences in activity patterns between weekdays and weekends?
 -------------------------------------------------------------------------
@@ -158,4 +143,4 @@ For plotting used the lattice package.
     xyplot(mean2 ~ interval | weekday, data = activity_weekdays2_sum, layout = c(1,2), type = "l", grid = TRUE, group = weekday,
            ylab = "Average number of steps", xlab = "Interval", lwd = 2, main = "Average daily steps by type of date")
 
-![](PA1_template_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+![Daily steps type date](figure/ads.png)
