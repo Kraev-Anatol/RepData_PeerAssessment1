@@ -65,7 +65,7 @@ calculate the mean and the median value.
 
     hist(sum_steps$sum_s, ylim = c(0,30), col = "blue", xlab = "Number of steps", main = "Total number of steps taken each day")
 
-![GitHub Logo](figure/tms.png)
+![Total number of steps](figure/tms.png)
 
 The mean of the total number of steps taken per day:
 
