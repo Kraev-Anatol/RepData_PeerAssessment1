@@ -86,28 +86,12 @@ Make a time series plot of the 5-minute interval (x-axis) and the
 average number of steps taken, averaged across all days (y-axis).
 
     activity_interval <- group_by(activity, interval)
-    mean_interval <- summarise(activity_interval, mean_i = mean(steps, na.rm = TRUE))
-    mean_interval
-
-    ## # A tibble: 288 x 2
-    ##    interval mean_i
-    ##       <int>  <dbl>
-    ##  1        0 1.72  
-    ##  2        5 0.340 
-    ##  3       10 0.132 
-    ##  4       15 0.151 
-    ##  5       20 0.0755
-    ##  6       25 2.09  
-    ##  7       30 0.528 
-    ##  8       35 0.868 
-    ##  9       40 0     
-    ## 10       45 1.47  
-    ## # ... with 278 more rows
+    mean_interval <- summarise(activity_interval, mean_i = mean(steps, na.rm = TRUE)) 
 
     with(mean_interval, plot(interval, mean_i, type="l", lwd = 2, col = "darkgreen", ylab = "Average number of steps", main = "Average number of steps per intervals"))
+![Average number steps](figure/ans.png)
 
-![](figure/Total number steps.png)
-Which is 5-minute interval, on average across all the days in the
+The 5-minute interval, on average across all the days in the
 dataset, contains the maximum number of steps?
 
     mean_interval[which.max(mean_interval$mean_i), ]$interval
